@@ -1462,9 +1462,10 @@ function showKF() {
     kfEl.style.transform = state.kfDX < 0 ? 'scaleX(-1)' : 'scaleX(1)';
   }, 400 + Math.random() * 600);
 
-  // Hide after enough time to cross screen
-  const crossTime = (SW + 200) / Math.abs(state.kfDX || speed) * (1000 / 60);
-  state.kfHideTimeout = setTimeout(hideKF, crossTime * 2.5);
+  // No timeout hide — exit is detected in the game loop when off-screen
+  state.kfHideTimeout = null;
+  // Track how long it's been on screen to force an exit after a max time
+  state.kfOnscreenFrames = 0;
 }
 function hideKF() {
   state.kingfisherVisible=false;
@@ -2356,7 +2357,23 @@ function gameLoop(){
   if(state.phase==='playing'){
     state.frame++;
     const f=state.frame;
-    if(state.kingfisherVisible){state.kfX+=state.kfDX;state.kfY+=state.kfDY;kfEl.style.left=state.kfX+'px';kfEl.style.top=state.kfY+'px';try{drawKingfisher(kfCtx,kfEl.width,kfEl.height,f);}catch(e){console.warn('kf draw err',e);}}
+    if(state.kingfisherVisible){
+      state.kfX+=state.kfDX; state.kfY+=state.kfDY;
+      kfEl.style.left=state.kfX+'px'; kfEl.style.top=state.kfY+'px';
+      try{drawKingfisher(kfCtx,kfEl.width,kfEl.height,f);}catch(e){console.warn('kf draw err',e);}
+      state.kfOnscreenFrames = (state.kfOnscreenFrames||0) + 1;
+      // Force exit direction: after 8s (≈480 frames) push bird toward nearest edge
+      if (state.kfOnscreenFrames > 480) {
+        // Flip so it heads toward the closer edge and stop direction changes
+        clearInterval(state.kfDirTimeout); state.kfDirTimeout = null;
+        state.kfDX = state.kfX < SW/2 ? -Math.abs(state.kfDX) : Math.abs(state.kfDX);
+        kfEl.style.transform = state.kfDX < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+      }
+      // Hide only when fully off-screen
+      const offLeft  = state.kfX + kfEl.width  < -10;
+      const offRight = state.kfX > SW + 10;
+      if (offLeft || offRight) hideKF();
+    }
     if(heronEl.style.display!=='none')drawHeron(heronCtx,heronEl.width,heronEl.height,f,state.heron.prop,state.heron.fart);
     if(foxEl.style.display!=='none'){drawFox(foxCtx,foxEl.width,foxEl.height,f);state.fox.x+=state.fox.dx;foxEl.style.left=state.fox.x+'px';}
     if(fox2El.style.display!=='none'){drawFoxNoTail(fox2Ctx,fox2El.width,fox2El.height,f);state.fox2.x+=state.fox2.dx;fox2El.style.left=state.fox2.x+'px';}
@@ -2590,7 +2607,7 @@ function sndRiverStop() {
 function startGame(){
   sndRiverStart();
   state={phase:'playing',film:TOTAL_FILM,photos:0,frame:0,savedPhotos:[],startTime:Date.now(),
-    kingfisherVisible:false,kfX:0,kfY:0,kfDX:0,kfDY:0,kfTimeout:null,kfHideTimeout:null,kfDirTimeout:null,
+    kingfisherVisible:false,kfX:0,kfY:0,kfDX:0,kfDY:0,kfOnscreenFrames:0,kfTimeout:null,kfHideTimeout:null,kfDirTimeout:null,
     heron:{visible:false,prop:null,fart:false},fox:{visible:false,x:0,dx:0},deer:{visible:false},cub:{visible:false,x:0,dx:0},
     badgers:{visible:false},otters:{visible:false},
     fish:{visible:false,x:0,y:0,arc:0},fox2:{visible:false,x:0,dx:0},
