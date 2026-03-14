@@ -35,6 +35,8 @@
   #deer       { position:absolute; width:80px; height:90px;  pointer-events:none; display:none; z-index:14; }
   #foxcub     { position:absolute; width:60px; height:55px;  pointer-events:none; display:none; z-index:14; }
   #bingbong   { position:absolute; width:165px; height:225px; pointer-events:none; display:none; z-index:18; bottom:-240px; }
+  #dogwalker  { position:absolute; width:1020px; height:1200px; pointer-events:none; display:none; z-index:18; bottom:-1200px; }
+  #jogger2    { position:absolute; width:220px; height:380px; pointer-events:none; display:none; z-index:18; bottom:-380px; }
   #badgers    { position:absolute; width:225px; height:135px; pointer-events:none; display:none; z-index:14; }
   #otters     { position:absolute; width:260px; height:200px; pointer-events:none; display:none; z-index:16; }
   #fish       { position:absolute; width:60px;  height:70px;  pointer-events:none; display:none; z-index:15; }
@@ -69,6 +71,29 @@
   .overlay h1 { font-family:'Fredoka One',cursive; font-size:clamp(26px,7vw,42px); color:#FFD700; text-shadow:2px 3px 0 #1a3d0a; margin-bottom:10px; line-height:1.2; }
   .overlay p { color:#c8e6c8; font-size:clamp(13px,3.8vw,15px); max-width:320px; line-height:1.65; margin-bottom:16px; }
   .overlay .emoji-row { font-size:30px; margin-bottom:12px; letter-spacing:5px; }
+
+  /* Initials entry */
+  .initials-section { margin:10px 0 14px; }
+  .initials-section label { color:#a8d8a8; font-size:clamp(12px,3.5vw,14px); display:block; margin-bottom:8px; }
+  .initials-row { display:flex; gap:8px; justify-content:center; align-items:center; }
+  .initials-input { width:44px; height:52px; background:rgba(255,255,255,0.12); border:2px solid #4a8a4a; border-radius:8px;
+    color:#FFD700; font-family:'Fredoka One',cursive; font-size:26px; text-align:center; text-transform:uppercase;
+    outline:none; caret-color:transparent; }
+  .initials-input:focus { border-color:#FFD700; background:rgba(255,215,0,0.12); }
+  .submit-score-btn { margin-top:10px; background:#2e7d32; color:#fff; border:none; border-radius:10px;
+    padding:9px 22px; font-family:'Fredoka One',cursive; font-size:16px; cursor:pointer; }
+  .submit-score-btn:active { background:#1b5e20; }
+
+  /* Leaderboard */
+  #leaderboard { width:100%; max-width:300px; margin:0 auto 14px; }
+  #leaderboard h3 { font-family:'Fredoka One',cursive; color:#FFD700; font-size:clamp(15px,4vw,18px); margin:0 0 8px; }
+  .lb-table { width:100%; border-collapse:collapse; }
+  .lb-table td { color:#c8e6c8; font-size:clamp(12px,3.5vw,14px); padding:3px 6px; }
+  .lb-table td:first-child { color:#FFD700; font-family:'Fredoka One',cursive; width:28px; }
+  .lb-table td:nth-child(2) { font-family:'Fredoka One',cursive; letter-spacing:2px; font-size:clamp(14px,4vw,16px); }
+  .lb-table td:last-child { text-align:right; color:#90c890; }
+  .lb-table tr:first-child td { color:#FFD700; }
+  .lb-empty { color:#6a9a6a; font-size:13px; font-style:italic; }
   .animals-list { font-size:13px; color:#8ecf8e; margin-bottom:18px; line-height:1.9; }
   .btn { font-family:'Fredoka One',cursive; font-size:19px; padding:13px 34px; border-radius:50px; border:none; cursor:pointer; background:linear-gradient(135deg,#e8a020,#c8720a); color:white; box-shadow:0 5px 18px rgba(0,0,0,0.5),0 -3px 0 rgba(0,0,0,0.25) inset; transition:transform 0.1s; touch-action:manipulation; }
   .btn:active { transform:scale(0.93); }
@@ -76,6 +101,7 @@
   #gallery, #win-gallery { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:8px 0 16px; }
   .gallery-photo { background:white; padding:5px 5px 16px; box-shadow:0 4px 12px rgba(0,0,0,0.5); transform:rotate(calc(var(--r)*1deg)); }
   .gallery-photo canvas { display:block; width:70px; height:56px; }
+
 </style>
 </head>
 <body>
@@ -92,6 +118,9 @@
   <canvas id="otters"     width="520" height="400"></canvas>
   <canvas id="fish"       width="120" height="140"></canvas>
   <canvas id="fox2"       width="180" height="160"></canvas>
+  <canvas id="tyre"       width="130" height="130"></canvas>
+  <canvas id="dogwalker"  width="1020" height="1200"></canvas>
+  <canvas id="jogger2"    width="220" height="380"></canvas>
 
   <div id="flash"></div>
 
@@ -124,10 +153,21 @@
   <div id="alert">💙 Kingfisher!</div>
   <div id="hint"></div>
 
+
+    <h1 id="l2-fail-title">Into the Dodder!</h1>
+    <p id="l2-fail-msg">You fell in!</p>
+    <button class="btn" id="l2-retry-btn">Try Level 2 Again 🔄</button>
+    <button class="btn" id="l2-quit-btn" style="margin-top:10px;background:linear-gradient(135deg,#555,#333);font-size:15px;padding:10px 24px;">Back to Start</button>
+  </div>
+
   <div class="overlay" id="start-screen">
     <div class="emoji-row">💙🐦📷</div>
     <h1>Snap the Kingfisher!</h1>
     <p>A kingfisher is darting along the River Dodder.<br>Get 3 photos before your 5 shots of film run out. But watch out for the locals!</p>
+    <div id="leaderboard">
+      <h3>🏆 Top Scores</h3>
+      <div id="lb-content"><p class="lb-empty">No scores yet — be the first!</p></div>
+    </div>
     <button class="btn" id="start-btn">Start Birdwatching!</button>
   </div>
 
@@ -136,6 +176,16 @@
     <h1>Out of Film!</h1>
     <p id="gameover-msg"></p>
     <div id="gallery"></div>
+    <div class="initials-section" id="go-initials-section">
+      <label>Enter your initials for the leaderboard:</label>
+      <div class="initials-row">
+        <input class="initials-input" id="go-i1" maxlength="1" type="text">
+        <input class="initials-input" id="go-i2" maxlength="1" type="text">
+        <input class="initials-input" id="go-i3" maxlength="1" type="text">
+      </div>
+      <button class="submit-score-btn" id="go-submit-btn">Submit Score</button>
+    </div>
+    <div id="go-lb" style="display:none;width:100%;max-width:300px;margin:0 auto 10px;"></div>
     <button class="btn" id="retry-btn">Try Again 🔄</button>
   </div>
 
@@ -144,6 +194,16 @@
     <h1>Got it!</h1>
     <p>Three kingfisher shots! The Dodder's jewel is yours.</p>
     <div id="win-gallery"></div>
+    <div class="initials-section" id="win-initials-section">
+      <label>Enter your initials for the leaderboard:</label>
+      <div class="initials-row">
+        <input class="initials-input" id="win-i1" maxlength="1" type="text">
+        <input class="initials-input" id="win-i2" maxlength="1" type="text">
+        <input class="initials-input" id="win-i3" maxlength="1" type="text">
+      </div>
+      <button class="submit-score-btn" id="win-submit-btn">Submit Score</button>
+    </div>
+    <div id="win-lb" style="display:none;width:100%;max-width:300px;margin:0 auto 10px;"></div>
     <button class="btn" id="play-again-btn">Play Again 🎉</button>
   </div>
 </div>
@@ -199,15 +259,15 @@ function paintScene() {
     c.fillRect(tx-5, fbY+fbH*0.35, 9+(i%3)*3, fbH*0.65);
   }
 
-  // ── RIVER — dark olive/brown Dodder water ──
+  // ── RIVER — clear-ish Dodder water ──
   const rY = fbY+fbH, rH = SH*0.26;
   const rG = c.createLinearGradient(0,rY,0,rY+rH);
-  rG.addColorStop(0,'#2a4428'); rG.addColorStop(0.5,'#304a2a'); rG.addColorStop(1,'#1c3418');
+  rG.addColorStop(0,'#3d7a6a'); rG.addColorStop(0.5,'#4a8a72'); rG.addColorStop(1,'#2d6050');
   c.fillStyle = rG; c.fillRect(0,rY,SW,rH);
 
-  // subtle reflections
+  // subtle reflections — sky shimmer
   for (let i=0;i<6;i++) {
-    c.fillStyle = `rgba(45,80,32,${0.1+i*0.025})`;
+    c.fillStyle = `rgba(120,190,160,${0.08+i*0.018})`;
     c.fillRect(0, rY+i*(rH/6), SW, rH/6*0.55);
   }
 
@@ -340,7 +400,7 @@ function drawKingfisher(ctx, w, h, frame) {
   ctx.closePath(); ctx.fill();
 }
 
-function drawHeron(ctx, w, h, frame, props) {
+function drawHeron(ctx, w, h, frame, props, farting) {
   ctx.clearRect(0,0,w,h);
   const bob = Math.sin(frame*0.06)*1.5;
   // legs
@@ -440,6 +500,41 @@ function drawHeron(ctx, w, h, frame, props) {
   ctx.beginPath(); ctx.moveTo(w*0.65,h*0.23); ctx.lineTo(w*1.02,h*0.25); ctx.lineTo(w*0.65,h*0.29); ctx.closePath(); ctx.fill();
   ctx.fillStyle='#b87010';
   ctx.beginPath(); ctx.moveTo(w*0.65,h*0.26); ctx.lineTo(w*1.02,h*0.25); ctx.lineTo(w*0.65,h*0.285); ctx.fill();
+  // fart cloud — drifts left from beneath the tail
+  if (farting) {
+    const ft = (frame % 90) / 90; // 0..1 cycle
+    const puffs = [
+      { age: ft,             r: 10, ox: -22, oy: -4  },
+      { age: (ft+0.35) % 1, r:  8, ox: -36, oy: -14 },
+      { age: (ft+0.65) % 1, r:  6, ox: -48, oy: -8  },
+    ];
+    for (const p of puffs) {
+      const alpha = 0.42 * Math.sin(p.age * Math.PI);
+      if (alpha <= 0) continue;
+      const drift = p.age * 18;
+      const rise  = p.age * 10;
+      const cx2   = w * 0.20 + p.ox - drift;
+      const cy2   = h * 0.78 + p.oy - rise + Math.sin(frame * 0.07 + p.ox) * 2;
+      const grad  = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, p.r + drift * 0.3);
+      grad.addColorStop(0,   `rgba(168,190,80,${alpha * 0.85})`);
+      grad.addColorStop(0.55,`rgba(140,168,60,${alpha * 0.55})`);
+      grad.addColorStop(1,   `rgba(120,148,40,0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx2, cy2, p.r + drift * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // wavy stink lines
+    ctx.strokeStyle = `rgba(148,172,55,${0.30 + 0.15 * Math.sin(frame * 0.18)})`;
+    ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+    for (let sl = 0; sl < 3; sl++) {
+      const sx = w * 0.18 - sl * 8 - (frame % 40) * 0.4;
+      const sy = h * 0.72 - sl * 5;
+      ctx.beginPath(); ctx.moveTo(sx, sy);
+      ctx.bezierCurveTo(sx - 7, sy - 7, sx - 4, sy - 14, sx - 10, sy - 20);
+      ctx.stroke();
+    }
+  }
 }
 
 function drawFox(ctx, w, h, frame) {
@@ -1222,7 +1317,7 @@ resizeWeather();
 // ── GAME STATE ────────────────────────────────────────────────────────────────
 const TOTAL_FILM = 5, PHOTOS_TO_WIN = 3;
 let state = { phase:'start', film:5, photos:0, frame:0, savedPhotos:[],
-  kingfisherVisible:false, kfX:0, kfY:0, kfDX:0,
+  kingfisherVisible:false, kfX:0, kfY:0, kfDX:0, kfDY:0,
   kfTimeout:null, kfHideTimeout:null,
   heron:{visible:false}, fox:{visible:false,x:0,dx:0},
   deer:{visible:false},  cub:{visible:false,x:0,dx:0},
@@ -1247,6 +1342,12 @@ const fishEl     = document.getElementById('fish');
 const fishCtx    = fishEl.getContext('2d');
 const fox2El     = document.getElementById('fox2');
 const fox2Ctx    = fox2El.getContext('2d');
+const tyreEl      = document.getElementById('tyre');
+const tyreCtx     = tyreEl.getContext('2d');
+const dogwalkerEl = document.getElementById('dogwalker');
+const dogwalkerCtx= dogwalkerEl.getContext('2d');
+const jogger2El   = document.getElementById('jogger2');
+const jogger2Ctx  = jogger2El.getContext('2d');
 const bbEl     = document.getElementById('bingbong');
 const bbCtx    = bbEl.getContext('2d');
 const flashEl  = document.getElementById('flash');
@@ -1320,30 +1421,58 @@ function sndKingfisherCall() {
 function scheduleKF() { if(state.phase!=='playing')return; state.kfTimeout=setTimeout(showKF,5000+Math.random()*9000); }
 function showKF() {
   if(state.phase!=='playing')return;
-  state.kfY=SH*(0.20+Math.random()*0.32);
-  state.kfX=-80; state.kfDX=(3.5+Math.random()*2.5)*2;
-  state.kingfisherVisible=true;
-  kfEl.style.display='block'; kfEl.style.top=state.kfY+'px'; kfEl.style.left=state.kfX+'px';
+
+  // River surface sits at sceneData.rY; kingfisher flies from water level up
+  const minY = sceneData.rY - kfEl.height;      // just above water
+  const maxY = sceneData.rY - SH * 0.12;        // max height above water
+  const yRange = Math.max(0, minY - maxY);
+  state.kfY = maxY + Math.random() * yRange;
+
+  const speed = 7 + Math.random() * 5;          // px/frame
+  const fromLeft = Math.random() > 0.5;
+
+  if (fromLeft) {                                // enter from left →
+    state.kfX  = -kfEl.width - 4;
+    state.kfDX = speed;
+    state.kfDY = 0;
+    kfEl.style.transform = 'scaleX(1)';
+  } else {                                       // enter from right ←
+    state.kfX  = SW + 4;
+    state.kfDX = -speed;
+    state.kfDY = 0;
+    kfEl.style.transform = 'scaleX(-1)';
+  }
+
+  state.kingfisherVisible = true;
+  kfEl.style.display = 'block';
+  kfEl.style.left = state.kfX + 'px';
+  kfEl.style.top  = state.kfY + 'px';
   showHint('Tap to snap!');
+
   // Call immediately then repeat every 1.8–3s while visible
   sndKingfisherCall();
   state.kfCallInterval = setInterval(() => {
-    if (state.kingfisherVisible) sndKingfisherCall();
+    if (state.kingfisherVisible && kfEl.style.display !== 'none') sndKingfisherCall();
   }, 1800 + Math.random() * 1200);
-  // random direction changes
+
+  // Random direction changes (flip horizontal occasionally)
   state.kfDirTimeout = setInterval(() => {
     if (!state.kingfisherVisible) return;
     state.kfDX *= -1;
     kfEl.style.transform = state.kfDX < 0 ? 'scaleX(-1)' : 'scaleX(1)';
   }, 400 + Math.random() * 600);
-  state.kfHideTimeout=setTimeout(hideKF,(SW+160)/Math.abs(state.kfDX)*(1000/60)*3);
+
+  // Hide after enough time to cross screen
+  const crossTime = (SW + 200) / Math.abs(state.kfDX || speed) * (1000 / 60);
+  state.kfHideTimeout = setTimeout(hideKF, crossTime * 2.5);
 }
 function hideKF() {
   state.kingfisherVisible=false;
   kfEl.style.display='none';
   kfEl.style.transform='scaleX(1)';
-  clearInterval(state.kfDirTimeout);
   clearInterval(state.kfCallInterval);
+  clearInterval(state.kfDirTimeout);
+  state.kfCallInterval = null;
   scheduleKF();
 }
 
@@ -1379,12 +1508,19 @@ function slideOut(el, direction, done) {
 }
 
 // ── DISTRACTORS ───────────────────────────────────────────────────────────────
-function startDistractors() { scheduleHeron(); scheduleFox(); scheduleFox2(); scheduleDeer(); scheduleCub(); scheduleBB(); scheduleBadgers(); scheduleOtters(); scheduleFish(); }
+function startDistractors() { scheduleHeron(); scheduleFox(); scheduleFox2(); scheduleDeer(); scheduleCub(); scheduleBB(); scheduleBadgers(); scheduleOtters(); scheduleFish(); scheduleTyre(); scheduleDogWalker(); scheduleJogger2(); }
+
+// ── DISTRACTOR CONCURRENCY CONTROL ───────────────────────────────────────────
+const DISTRACTOR_KEYS = ['heron','fox','deer','cub','fox2','fish','badgers','otters','bb','tyre'];
+const MAX_CONCURRENT = 1;
+function activeCount() { return DISTRACTOR_KEYS.filter(k => state[k] && state[k].visible).length; }
+function canShow(key)  { return !state[key].visible && activeCount() < MAX_CONCURRENT; }
 
 function scheduleHeron() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
+    if(!canShow('heron')) { scheduleHeron(); return; }
     heronEl.style.display = 'block';
     heronEl.style.left = (15 + Math.random() * 55) + '%';
     heronEl.style.top  = (sceneData.wY - 95) + 'px';
@@ -1392,6 +1528,14 @@ function scheduleHeron() {
     // 40% chance of carrying something
     const roll = Math.random();
     state.heron.prop = roll < 0.2 ? 'newspaper' : roll < 0.4 ? 'toiletroll' : null;
+    // 25% chance of a fart, delayed 1.5–3s after appearing
+    state.heron.fart = false;
+    if (Math.random() < 0.25) {
+      setTimeout(() => {
+        if (state.heron.visible) { state.heron.fart = true; sndHeronFart();
+          setTimeout(() => { state.heron.fart = false; }, 1800); }
+      }, 1500 + Math.random() * 1500);
+    }
     setTimeout(() => {
       state.heron.visible = false;
       slideOut(heronEl, 'up', scheduleHeron);
@@ -1403,15 +1547,15 @@ function scheduleFox() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
+    if(!canShow('fox')) { scheduleFox(); return; }
     const fromLeft = Math.random() > 0.5;
     state.fox.x = fromLeft ? -100 : SW + 20;
     state.fox.dx = fromLeft ? 1.8 : -1.8;
     foxEl.style.left = state.fox.x + 'px';
-    foxEl.style.top  = (sceneData.bY - 50 + Math.random() * 18) + 'px';
+    foxEl.style.top  = (sceneData.bY - 140) + 'px';   // feet at bY+20 (upper grass)
     foxEl.style.transform = fromLeft ? 'scaleX(1)' : 'scaleX(-1)';
     foxEl.style.display = 'block';
     state.fox.visible = true;
-    // fox walks fully off the opposite side naturally (dx keeps moving it)
     const dur = (SW + 200) / Math.abs(state.fox.dx) * (1000 / 60);
     setTimeout(() => { foxEl.style.display='none'; state.fox.visible=false; scheduleFox(); }, dur);
   }, 3000 + Math.random() * 10000);
@@ -1421,15 +1565,41 @@ function scheduleDeer() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
-    deerEl.style.left = (10 + Math.random() * 60) + '%';
-    deerEl.style.top  = (sceneData.fbY + sceneData.fbH * 0.05 + Math.random() * sceneData.fbH * 0.28) + 'px';
+    if(!canShow('deer')) { scheduleDeer(); return; }
+    const fromLeft = Math.random() > 0.5;
+    // Start just off-screen on chosen side, in the far-bank foliage band
+    const startX = fromLeft ? -deerEl.width : SW;
+    deerEl.style.left = startX + 'px';
+    deerEl.style.top  = (sceneData.rY - (deerEl.offsetHeight || 90) - 5) + 'px';
+    deerEl.style.transform = fromLeft ? 'scaleX(1)' : 'scaleX(-1)';
     deerEl.style.display = 'block';
     state.deer.visible = true;
-    // deer slowly backs into the foliage (slide up)
-    setTimeout(() => {
-      state.deer.visible = false;
-      slideOut(deerEl, 'up', scheduleDeer);
-    }, 3500 + Math.random() * 4000);
+    // Walk in a short distance then pause
+    const destX = fromLeft
+      ? (SW * 0.08 + Math.random() * SW * 0.30)
+      : (SW * 0.62 + Math.random() * SW * 0.25);
+    const totalDist = Math.abs(destX - startX);
+    const walkSpeed = 1.2; // px/frame
+    const walkFrames = Math.round(totalDist / walkSpeed);
+    let f = 0;
+    const walkIn = setInterval(() => {
+      f++;
+      const prog = Math.min(f / walkFrames, 1);
+      const ease = prog < 0.5 ? 2*prog*prog : 1-Math.pow(-2*prog+2,2)/2;
+      deerEl.style.left = (startX + (destX - startX) * ease) + 'px';
+      if (f >= walkFrames) {
+        clearInterval(walkIn);
+        // Linger, then back out the same side
+        const lingerMs = 2000 + Math.random() * 3000;
+        setTimeout(() => {
+          if(state.phase!=='playing') return;
+          state.deer.visible = false;
+          // Flip to face back out and slide off
+          deerEl.style.transform = fromLeft ? 'scaleX(-1)' : 'scaleX(1)';
+          slideOut(deerEl, fromLeft ? 'left' : 'right', scheduleDeer);
+        }, lingerMs);
+      }
+    }, 16);
   }, 6000 + Math.random() * 12000);
 }
 
@@ -1437,15 +1607,15 @@ function scheduleCub() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
+    if(!canShow('cub')) { scheduleCub(); return; }
     const fromLeft = Math.random() > 0.5;
     state.cub.x = fromLeft ? -70 : SW + 10;
     state.cub.dx = fromLeft ? 3.2 : -3.2;
     cubEl.style.left = state.cub.x + 'px';
-    cubEl.style.top  = (sceneData.bY - 25 + Math.random() * 22) + 'px';
+    cubEl.style.top  = (sceneData.bY - 55) + 'px';   // feet at bY+55 (mid grass)
     cubEl.style.transform = fromLeft ? 'scaleX(1)' : 'scaleX(-1)';
     cubEl.style.display = 'block';
     state.cub.visible = true;
-    // cub runs fully off screen naturally
     const dur = (SW + 140) / Math.abs(state.cub.dx) * (1000 / 60);
     setTimeout(() => { cubEl.style.display='none'; state.cub.visible=false; scheduleCub(); }, dur);
   }, 4000 + Math.random() * 11000);
@@ -1455,24 +1625,25 @@ function scheduleFox2() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
+    if(!canShow('fox2')) { scheduleFox2(); return; }
     const fromLeft = Math.random() > 0.5;
     state.fox2.x = fromLeft ? -100 : SW + 20;
-    state.fox2.dx = fromLeft ? 1.4 : -1.4; // slightly slower — world-weary
+    state.fox2.dx = fromLeft ? 1.4 : -1.4;
     fox2El.style.left = state.fox2.x + 'px';
-    fox2El.style.top  = (sceneData.bY - 48 + Math.random() * 20) + 'px';
+    fox2El.style.top  = (sceneData.rY - (fox2El.offsetHeight || 80) - 5) + 'px';
     fox2El.style.transform = fromLeft ? 'scaleX(1)' : 'scaleX(-1)';
     fox2El.style.display = 'block';
     state.fox2.visible = true;
     const dur = (SW + 220) / Math.abs(state.fox2.dx) * (1000 / 60);
     setTimeout(() => { fox2El.style.display='none'; state.fox2.visible=false; scheduleFox2(); }, dur);
-  }, 9000 + Math.random() * 18000); // rarer than normal fox
+  }, 9000 + Math.random() * 18000);
 }
 
 function scheduleFish() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
-    // Pick a random x position along the river
+    if(!canShow('fish')) { scheduleFish(); return; }
     const xPos = SW * (0.1 + Math.random() * 0.75);
     const riverMid = sceneData.rY + sceneData.rH * 0.3;
     fishEl.style.left = (xPos - 30) + 'px';
@@ -1481,12 +1652,10 @@ function scheduleFish() {
 
     const totalFrames = 55;
     let f = 0;
-    // parabolic arc: rises then falls back into river
     const peakHeight = 55 + Math.random() * 35;
     const iv = setInterval(() => {
       f++;
       const arc = f / totalFrames;
-      // parabola: y offset = 4*peakHeight*arc*(1-arc)
       const yOff = 4 * peakHeight * arc * (1 - arc);
       fishEl.style.top = (riverMid - yOff) + 'px';
       state.fish.arc = arc;
@@ -1504,12 +1673,12 @@ function scheduleBadgers() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
+    if(!canShow('badgers')) { scheduleBadgers(); return; }
     badgersEl.style.left = (10 + Math.random() * 55) + '%';
-    badgersEl.style.top  = (sceneData.bY - 110 + Math.random() * 20) + 'px';
+    badgersEl.style.top  = (sceneData.bY - 110) + 'px';  // feet at bY+70 (lower grass)
     badgersEl.style.display = 'block';
     state.badgers.visible = true;
     sndBadgers();
-    // badgers tumble off to a random side
     setTimeout(() => {
       state.badgers.visible = false;
       slideOut(badgersEl, Math.random() > 0.5 ? 'left' : 'right', scheduleBadgers);
@@ -1521,12 +1690,12 @@ function scheduleOtters() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
+    if(!canShow('otters')) { scheduleOtters(); return; }
     ottersEl.style.left = (5 + Math.random() * 50) + '%';
-    ottersEl.style.top  = (sceneData.rY + sceneData.rH * 0.55 + Math.random() * 20) + 'px';
+    ottersEl.style.top  = (sceneData.rY + sceneData.rH * 0.08) + 'px';
     ottersEl.style.display = 'block';
     state.otters.visible = true;
     sndOtters();
-    // otters dive back into the river (slide down)
     setTimeout(() => {
       state.otters.visible = false;
       slideOut(ottersEl, 'down', scheduleOtters);
@@ -1534,11 +1703,488 @@ function scheduleOtters() {
   }, 8000 + Math.random() * 12000);
 }
 
+function drawTyre(ctx, w, h, frame) {
+  ctx.clearRect(0, 0, w, h);
+  const cx = w / 2, cy = h / 2;
+  // Slow gentle bob on the current
+  const bob = Math.sin(frame * 0.04) * 2.5;
+  const tilt = Math.sin(frame * 0.025) * 0.12; // slight rotation
+  ctx.save();
+  ctx.translate(cx, cy + bob);
+  ctx.rotate(tilt);
+
+  const outerR = 46, innerR = 28, wallW = outerR - innerR;
+
+  // Tyre shadow on water
+  ctx.save();
+  ctx.scale(1, 0.28);
+  ctx.beginPath();
+  ctx.arc(0, outerR + 6, outerR * 0.9, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.fill();
+  ctx.restore();
+
+  // Outer tyre body — worn black rubber
+  ctx.beginPath();
+  ctx.arc(0, 0, outerR, 0, Math.PI * 2);
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fill();
+
+  // Tyre tread grooves — concentric rings
+  for (let r = innerR + 2; r < outerR - 2; r += 5) {
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Radial tread marks
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    const r1 = innerR + 3, r2 = outerR - 3;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+    ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Rim highlight (worn edge)
+  ctx.beginPath();
+  ctx.arc(0, 0, outerR - 1, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(80,80,80,0.6)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Inner hole — water visible through it, slight green tint
+  ctx.beginPath();
+  ctx.arc(0, 0, innerR, 0, Math.PI * 2);
+  ctx.fillStyle = '#3d7a6a';
+  ctx.fill();
+
+  // Water shimmer inside hole
+  ctx.beginPath();
+  ctx.arc(-6, -6, innerR * 0.55, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(120,190,160,${0.15 + 0.08 * Math.sin(frame * 0.07)})`;
+  ctx.fill();
+
+  // Algae patches on tyre — it's been in the river a while
+  const algaeSpots = [[outerR - 8, -15, 7], [-outerR + 9, 8, 5], [10, outerR - 7, 6]];
+  for (const [ax, ay, ar] of algaeSpots) {
+    ctx.beginPath();
+    ctx.arc(ax, ay, ar, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(60,120,50,0.55)';
+    ctx.fill();
+  }
+
+  // Water surface glint across tyre
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, 0, outerR, 0, Math.PI * 2);
+  ctx.clip();
+  const glint = ctx.createLinearGradient(-outerR, -outerR, outerR * 0.3, outerR * 0.1);
+  glint.addColorStop(0, `rgba(255,255,255,${0.04 + 0.03 * Math.sin(frame * 0.05)})`);
+  glint.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = glint;
+  ctx.fillRect(-outerR, -outerR, outerR * 2, outerR * 2);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function scheduleTyre() {
+  if (state.phase !== 'playing') return;
+  setTimeout(() => {
+    if (state.phase !== 'playing') return;
+    if (!canShow('tyre')) { scheduleTyre(); return; }
+    const fromLeft = Math.random() > 0.5;
+    state.tyre.x = fromLeft ? -140 : SW + 20;
+    state.tyre.dx = fromLeft ? 0.6 : -0.6; // slow drift on the current
+    tyreEl.style.left = state.tyre.x + 'px';
+    // Float on the river surface — slightly submerged
+    tyreEl.style.top = (sceneData.rY + sceneData.rH * 0.35 + Math.random() * sceneData.rH * 0.2) + 'px';
+    tyreEl.style.display = 'block';
+    state.tyre.visible = true;
+    const dur = (SW + 200) / Math.abs(state.tyre.dx) * (1000 / 60);
+    setTimeout(() => { tyreEl.style.display = 'none'; state.tyre.visible = false; scheduleTyre(); }, dur);
+  }, 12000 + Math.random() * 20000); // rare — every 12–32 seconds
+}
+
+// ── DOG WALKER approaching ────────────────────────────────────────────────────
+function sndDogBark() {
+  const ctx = getAudioCtx(); const t = ctx.currentTime;
+  // Sharp bark — noise burst with tonal thump
+  playNoise(0.08, 0.55, 800, ctx, t);
+  playNoise(0.05, 0.35, 600, ctx, t + 0.10);
+  playTone(180, 'sawtooth', 0.06, 0.5, t, ctx);
+  playTone(140, 'sawtooth', 0.04, 0.35, t + 0.10, ctx);
+  // Second bark
+  setTimeout(() => {
+    if (!getAudioCtx) return;
+    const ctx2 = getAudioCtx(); const t2 = ctx2.currentTime;
+    playNoise(0.09, 0.5, 750, ctx2, t2);
+    playTone(170, 'sawtooth', 0.06, 0.45, t2, ctx2);
+  }, 420 + Math.random() * 180);
+}
+
+function drawDogWalker(ctx, w, h, frame) {
+  ctx.clearRect(0, 0, w, h);
+  const f = frame;
+  const wc  = Math.sin(f * 0.17);   // walk cycle
+  const bob = Math.abs(wc) * 2.5;
+
+  // figures sit at canvas bottom
+  const groundY = h - 18;
+
+  // ── Dog (ahead of walker, to the right, facing right) ──────────────────────
+  const dCX = w * 0.62, dCY = groundY - 28 - bob * 0.7;
+  ctx.save(); ctx.translate(dCX, dCY);
+
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(0,32,26,7,0,0,Math.PI*2); ctx.fill();
+  // body
+  ctx.fillStyle = '#c89050';
+  ctx.beginPath(); ctx.ellipse(4,0,30,15,0.08,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#e0b878'; ctx.beginPath(); ctx.ellipse(4,4,19,9,0.08,0,Math.PI*2); ctx.fill(); // belly
+  // neck + head facing right
+  ctx.fillStyle = '#c89050'; ctx.beginPath(); ctx.ellipse(28,-10,13,10,0.3,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#c89050'; ctx.beginPath(); ctx.arc(36,-16,13,0,Math.PI*2); ctx.fill();
+  // snout
+  ctx.fillStyle = '#a87038'; ctx.beginPath(); ctx.ellipse(47,-14,10,7,0.1,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#1a0800'; ctx.beginPath(); ctx.ellipse(55,-13,4,3,0,0,Math.PI*2); ctx.fill(); // nose
+  // eye
+  ctx.fillStyle = '#1a0800'; ctx.beginPath(); ctx.arc(33,-19,4,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.65)'; ctx.beginPath(); ctx.arc(35,-21,1.5,0,Math.PI*2); ctx.fill();
+  // floppy ear
+  ctx.fillStyle = '#a87038'; ctx.beginPath(); ctx.ellipse(30,-10,7,14,0.5,0,Math.PI*2); ctx.fill();
+  // tongue
+  ctx.fillStyle = '#e05068'; ctx.beginPath(); ctx.ellipse(50,-8,5,7,0.15,0,Math.PI*2); ctx.fill();
+  // legs — side pair animated
+  ctx.strokeStyle = '#c89050'; ctx.lineWidth = 8; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-10,14); ctx.lineTo(-10+wc*14,32); ctx.stroke(); // back legs
+  ctx.beginPath(); ctx.moveTo(0,14);   ctx.lineTo(0-wc*14,32);   ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(14,12);  ctx.lineTo(14+wc*14,32);  ctx.stroke(); // front legs
+  ctx.beginPath(); ctx.moveTo(22,12);  ctx.lineTo(22-wc*14,32);  ctx.stroke();
+  // paws
+  ctx.fillStyle = '#8a5820';
+  [[-10+wc*14],[0-wc*14],[14+wc*14],[22-wc*14]].forEach(px => {
+    ctx.beginPath(); ctx.ellipse(px,33,7,4,0.1,0,Math.PI*2); ctx.fill();
+  });
+  // tail (wagging up behind)
+  const wag = Math.sin(f * 0.3) * 0.6;
+  ctx.strokeStyle = '#c89050'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-22,0);
+  ctx.bezierCurveTo(-34,-8+wag*16,-36,-18+wag*14,-28,-26+wag*8); ctx.stroke();
+  // bark bubble
+  if (Math.sin(f * 0.055) > 0.58) {
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.roundRect(14,-52,72,26,8); ctx.fill();
+    ctx.fillStyle = '#444'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('WOOF! 🐾', 50, -32);
+    // bubble tail
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.moveTo(28,-26); ctx.lineTo(36,-26); ctx.lineTo(32,-18); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+
+  // ── Walker (behind/left of dog, facing right) ────────────────────────────
+  const wCX = w * 0.28, wCY = groundY - bob;
+  ctx.save(); ctx.translate(wCX, wCY);
+
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.beginPath(); ctx.ellipse(0,4,18,5,0,0,Math.PI*2); ctx.fill();
+  // boots / feet
+  ctx.fillStyle = '#2a1810';
+  ctx.beginPath(); ctx.ellipse(-10+wc*20,2,11,5,0.15,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(2-wc*20,2,11,5,0.15,0,Math.PI*2); ctx.fill();
+  // legs
+  ctx.strokeStyle = '#3a3460'; ctx.lineWidth = 12; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-4,-30); ctx.lineTo(-10+wc*20,-2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(4,-30);  ctx.lineTo(2-wc*20,-2);   ctx.stroke();
+  // jacket (dark green, side view)
+  ctx.fillStyle = '#4a6e3a';
+  ctx.beginPath(); ctx.roundRect(-16,-82,32,54,8); ctx.fill();
+  // back arm
+  ctx.strokeStyle = '#3a5e2a'; ctx.lineWidth = 11;
+  ctx.beginPath(); ctx.moveTo(-14,-70); ctx.lineTo(-22-wc*10,-48); ctx.stroke();
+  // forward arm (holding lead)
+  ctx.strokeStyle = '#4a6e3a'; ctx.lineWidth = 11;
+  ctx.beginPath(); ctx.moveTo(14,-70); ctx.lineTo(26+wc*10,-48); ctx.stroke();
+  ctx.fillStyle = '#d8aa78'; ctx.beginPath(); ctx.arc(26+wc*10,-48,7,0,Math.PI*2); ctx.fill(); // hand
+  // head (side profile, facing right)
+  ctx.fillStyle = '#e8c89a'; ctx.beginPath(); ctx.arc(8,-96,16,0,Math.PI*2); ctx.fill();
+  // hair
+  ctx.fillStyle = '#4a3020'; ctx.beginPath(); ctx.ellipse(4,-106,15,8,-0.1,0,Math.PI*2); ctx.fill();
+  // eye (side profile)
+  ctx.fillStyle = '#1a0808'; ctx.beginPath(); ctx.arc(16,-97,2.8,0,Math.PI*2); ctx.fill();
+  // nose (profile bump)
+  ctx.fillStyle = '#d8a880';
+  ctx.beginPath(); ctx.moveTo(22,-93); ctx.quadraticCurveTo(27,-90,22,-86); ctx.stroke();
+  ctx.restore();
+
+  // ── Lead ──────────────────────────────────────────────────────────────────
+  const handX = wCX + 26+wc*10, handY = wCY - 48;
+  const collarX = dCX + 28, collarY = dCY - 8;
+  ctx.strokeStyle = 'rgba(200,180,140,0.88)'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(handX, handY);
+  ctx.quadraticCurveTo((handX+collarX)*0.5, (handY+collarY)*0.5 + 20, collarX, collarY);
+  ctx.stroke();
+}
+
+function scheduleDogWalker() {
+  if (state.phase !== 'playing') return;
+  setTimeout(() => {
+    if (state.phase !== 'playing') return;
+    if (!canShow('dogwalker') || state.jogger2.visible || state.bb.visible) { scheduleDogWalker(); return; }
+
+    const elH = dogwalkerEl.offsetHeight || 1200;
+    const elW = dogwalkerEl.offsetWidth  || 1020;
+    const xPos = SW * (0.15 + Math.random() * 0.50) - elW / 2;
+
+    // Start off-screen below, centred
+    dogwalkerEl.style.left   = xPos + 'px';
+    dogwalkerEl.style.bottom = (-elH) + 'px';
+    dogwalkerEl.style.top    = '';
+    dogwalkerEl.style.transformOrigin = 'bottom center';
+    dogwalkerEl.style.transform = 'scale(0.15)';
+    dogwalkerEl.style.display = 'block';
+    state.dogwalker.visible = true;
+    state.dogwalker.scale   = 0.15;
+    state.dogwalker.bottom  = -elH;
+
+    // Phase 1: rise up from bottom (BB-style)
+    const riseFrames = 28;
+    let rf = 0;
+    const rise = setInterval(() => {
+      rf++;
+      const ease = 1 - Math.pow(1 - rf / riseFrames, 3);
+      const bot = -elH + ease * elH; // rise until fully above bottom edge
+      dogwalkerEl.style.bottom = bot + 'px';
+      state.dogwalker.bottom = bot;
+      if (rf >= riseFrames) clearInterval(rise);
+    }, 16);
+
+    // Phase 2: after brief pause, run toward player (scale up)
+    const pauseMs = 300 + Math.random() * 200;
+    setTimeout(() => {
+      if (!state.dogwalker.visible) return;
+      sndDogBark();
+      setTimeout(() => { if (state.dogwalker.visible) sndDogBark(); }, 700 + Math.random()*300);
+
+      const approachMs = 2800;
+      const approachStart = Date.now();
+      const grow = setInterval(() => {
+        const t = Math.min((Date.now() - approachStart) / approachMs, 1);
+        const sc = 0.15 + t * 0.85;   // 0.15 → 1.0
+        dogwalkerEl.style.transform = `scale(${sc.toFixed(3)})`;
+        state.dogwalker.scale = sc;
+        if (t >= 1) clearInterval(grow);
+      }, 16);
+
+      // Phase 3: drop back down when fully close
+      setTimeout(() => {
+        clearInterval(grow);
+        if (!state.dogwalker.visible) return;
+        let ff = 0;
+        const fall = setInterval(() => {
+          ff++;
+          const ease2 = Math.pow(ff / riseFrames, 2);
+          dogwalkerEl.style.bottom = (state.dogwalker.bottom - ease2 * (elH + 40)) + 'px';
+          if (ff >= riseFrames) {
+            clearInterval(fall);
+            dogwalkerEl.style.display = 'none';
+            dogwalkerEl.style.transform = 'scale(1)';
+            state.dogwalker.visible = false;
+            scheduleDogWalker();
+          }
+        }, 16);
+      }, approachMs + 100);
+    }, riseFrames * 16 + pauseMs);
+  }, 9000 + Math.random() * 18000);
+}
+
+// ── JOGGER2 approaching ───────────────────────────────────────────────────────
+function sndBeepBeep() {
+  const ctx = getAudioCtx(); const t = ctx.currentTime;
+  // Two cheerful horn toots
+  [0, 0.32].forEach((offset, i) => {
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+    osc.connect(env); env.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(i === 0 ? 660 : 880, t + offset);
+    env.gain.setValueAtTime(0.28, t + offset);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + offset + 0.22);
+    osc.start(t + offset); osc.stop(t + offset + 0.25);
+  });
+}
+
+function drawJogger2(ctx, w, h, frame) {
+  ctx.clearRect(0, 0, w, h);
+  const f   = frame;
+  const jf  = f * 0.28;
+  const leg = Math.sin(jf) * 0.72;
+  const arm = Math.sin(jf) * 0.58;
+  const bob = Math.abs(Math.sin(jf)) * 4;
+
+  const groundY = h - 18;
+  const cx = w * 0.5, cy = groundY - bob;
+
+  ctx.save(); ctx.translate(cx, cy);
+  // Mirror for left-facing
+  ctx.scale(-1, 1);
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.20)'; ctx.beginPath(); ctx.ellipse(0,4,22,6,0,0,Math.PI*2); ctx.fill();
+
+  // Trainers
+  ctx.fillStyle = '#e85820';
+  ctx.beginPath(); ctx.ellipse(-14+leg*26,4,13,5.5,0.18,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10-leg*26,4,13,5.5,0.18,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.82)';
+  ctx.beginPath(); ctx.ellipse(-14+leg*26,0,9,3.5,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10-leg*26,0,9,3.5,0,0,Math.PI*2); ctx.fill();
+
+  // Tights
+  ctx.strokeStyle = '#222240'; ctx.lineWidth = 14; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-6,-28); ctx.lineTo(-14+leg*26,0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(6,-28);  ctx.lineTo(10-leg*26,0);  ctx.stroke();
+
+  // Hi-vis body
+  ctx.fillStyle = '#e8d020';
+  ctx.beginPath(); ctx.roundRect(-19,-80,38,54,9); ctx.fill();
+  ctx.strokeStyle = 'rgba(200,180,0,0.55)'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(-19,-58); ctx.lineTo(19,-58); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-19,-48); ctx.lineTo(19,-48); ctx.stroke();
+
+  // Race bib
+  ctx.fillStyle = 'rgba(255,255,255,0.90)'; ctx.beginPath(); ctx.roundRect(-12,-78,24,22,3); ctx.fill();
+  ctx.fillStyle = '#c02020'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('42K', 0, -62);
+  ctx.fillStyle = '#555'; ctx.font = '6px sans-serif'; ctx.fillText('DODDER', 0, -72);
+
+  // Back arm
+  ctx.strokeStyle = '#c8b018'; ctx.lineWidth = 11; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-17,-70); ctx.lineTo(-30-arm*18,-50); ctx.stroke();
+  // Forward arm
+  ctx.strokeStyle = '#e8d020'; ctx.lineWidth = 11;
+  ctx.beginPath(); ctx.moveTo(17,-70); ctx.lineTo(30+arm*18,-50); ctx.stroke();
+  ctx.fillStyle = '#e85820';
+  ctx.beginPath(); ctx.arc(30+arm*18,-50,8,0,Math.PI*2); ctx.fill();
+
+  // Head (side profile, facing right in local space = left on screen due to mirror)
+  ctx.fillStyle = '#e8c898'; ctx.beginPath(); ctx.arc(6,-94,17,0,Math.PI*2); ctx.fill();
+  // Sweatband
+  ctx.fillStyle = '#e8d020'; ctx.beginPath(); ctx.roundRect(-10,-107,30,11,3); ctx.fill();
+  // Shades (side)
+  ctx.fillStyle = 'rgba(10,10,30,0.88)';
+  ctx.beginPath(); ctx.roundRect(8,-100,15,8,3); ctx.fill();
+  // Nose bump
+  ctx.fillStyle = '#d8a880'; ctx.strokeStyle = '#d8a880'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(21,-90); ctx.quadraticCurveTo(26,-87,21,-82); ctx.stroke();
+  // Grimace
+  ctx.strokeStyle = '#c07040'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(14,-82,5,0.2,Math.PI*0.7); ctx.stroke();
+  // Earbud
+  ctx.fillStyle = 'rgba(240,240,245,0.9)'; ctx.beginPath(); ctx.arc(-10,-96,3.5,0,Math.PI*2); ctx.fill();
+
+  ctx.restore(); // end mirror
+
+  // "Beep beep!" bubble (unmirrored — stays readable)
+  if (Math.sin(f * 0.06) > 0.38) {
+    const bx = cx - 58, by = cy - 148;
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.roundRect(bx, by, 116, 30, 8); ctx.fill();
+    ctx.strokeStyle = '#e8d020'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.roundRect(bx, by, 116, 30, 8); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.moveTo(cx-6, by+30); ctx.lineTo(cx+6, by+30); ctx.lineTo(cx, by+42); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#e8d020'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx-6,by+30); ctx.lineTo(cx,by+42); ctx.lineTo(cx+6,by+30); ctx.stroke();
+    ctx.fillStyle = '#c02020'; ctx.font = "bold 14px 'Fredoka One',cursive";
+    ctx.textAlign = 'center'; ctx.fillText('Beep beep! 📣', cx, by + 21);
+  }
+}
+
+function scheduleJogger2() {
+  if (state.phase !== 'playing') return;
+  setTimeout(() => {
+    if (state.phase !== 'playing') return;
+    if (!canShow('jogger2') || state.dogwalker.visible || state.bb.visible) { scheduleJogger2(); return; }
+
+    const elH = jogger2El.height;
+    const elW = jogger2El.width;
+    const xPos = SW * (0.15 + Math.random() * 0.50) - elW / 2;
+
+    jogger2El.style.left   = xPos + 'px';
+    jogger2El.style.bottom = (-elH) + 'px';
+    jogger2El.style.top    = '';
+    jogger2El.style.transformOrigin = 'bottom center';
+    jogger2El.style.transform = 'scale(0.15)';
+    jogger2El.style.display = 'block';
+    state.jogger2.visible = true;
+    state.jogger2.scale   = 0.15;
+    state.jogger2.bottom  = -elH;
+
+    // Phase 1: rise
+    const riseFrames = 28;
+    let rf = 0;
+    const rise = setInterval(() => {
+      rf++;
+      const ease = 1 - Math.pow(1 - rf / riseFrames, 3);
+      const bot = -elH + ease * elH; // rise until fully above bottom edge
+      jogger2El.style.bottom = bot + 'px';
+      state.jogger2.bottom = bot;
+      if (rf >= riseFrames) clearInterval(rise);
+    }, 16);
+
+    // Phase 2: run toward player
+    const pauseMs = 200 + Math.random() * 200;
+    setTimeout(() => {
+      if (!state.jogger2.visible) return;
+      sndBeepBeep();
+      setTimeout(() => { if (state.jogger2.visible) sndBeepBeep(); }, 1100 + Math.random()*300);
+
+      const approachMs = 2400;
+      const approachStart = Date.now();
+      const grow = setInterval(() => {
+        const t = Math.min((Date.now() - approachStart) / approachMs, 1);
+        const sc = 0.15 + t * 0.85;
+        jogger2El.style.transform = `scale(${sc.toFixed(3)})`;
+        state.jogger2.scale = sc;
+        if (t >= 1) clearInterval(grow);
+      }, 16);
+
+      // Phase 3: drop back
+      setTimeout(() => {
+        clearInterval(grow);
+        if (!state.jogger2.visible) return;
+        let ff = 0;
+        const fall = setInterval(() => {
+          ff++;
+          const ease2 = Math.pow(ff / riseFrames, 2);
+          jogger2El.style.bottom = (state.jogger2.bottom - ease2 * (elH + 40)) + 'px';
+          if (ff >= riseFrames) {
+            clearInterval(fall);
+            jogger2El.style.display = 'none';
+            jogger2El.style.transform = 'scale(1)';
+            state.jogger2.visible = false;
+            scheduleJogger2();
+          }
+        }, 16);
+      }, approachMs + 100);
+    }, riseFrames * 16 + pauseMs);
+  }, 10000 + Math.random() * 16000);
+}
+
+
 function scheduleBB() {
   if(state.phase!=='playing') return;
   setTimeout(() => {
     if(state.phase!=='playing') return;
-    // random horizontal position, always pops up from bottom
+    if(!canShow('bb') || state.dogwalker.visible || state.jogger2.visible) { scheduleBB(); return; }
     const xPos = SW * (0.1 + Math.random() * 0.65);
     bbEl.style.left = xPos + 'px';
     bbEl.style.bottom = '-240px';
@@ -1580,8 +2226,9 @@ function moveVF(x,y){ vfX=x;vfY=y; vfEl.style.left=x+'px'; vfEl.style.top=y+'px'
 const gameEl=document.getElementById('game');
 gameEl.addEventListener('mousemove',e=>{ if(state.phase!=='playing')return; moveVF(e.clientX,e.clientY); });
 gameEl.addEventListener('click',e=>{ if(state.phase!=='playing'||e.target.classList.contains('btn'))return; moveVF(e.clientX,e.clientY); takePhoto(); });
-gameEl.addEventListener('touchstart',e=>{ if(state.phase!=='playing'||e.target.classList.contains('btn'))return; e.preventDefault(); const t=e.touches[0]; moveVF(t.clientX,t.clientY); takePhoto(); },{passive:false});
+gameEl.addEventListener('touchstart',e=>{ if(state.phase!=='playing'||e.target.classList.contains('btn'))return; e.preventDefault(); const t=e.touches[0]; moveVF(t.clientX,t.clientY); },{passive:false});
 gameEl.addEventListener('touchmove', e=>{ if(state.phase!=='playing')return; e.preventDefault(); const t=e.touches[0]; moveVF(t.clientX,t.clientY); },{passive:false});
+gameEl.addEventListener('touchend',  e=>{ if(state.phase!=='playing'||e.target.classList.contains('btn'))return; e.preventDefault(); takePhoto(); },{passive:false});
 
 // ── SHUTTER ───────────────────────────────────────────────────────────────────
 function takePhoto() {
@@ -1613,7 +2260,7 @@ function takePhoto() {
 }
 
 function getMissLabel(){
-  const checks=[{el:heronEl,label:'🦅 Just the heron!'},{el:foxEl,label:'🦊 That fox!'},{el:fox2El,label:'🦊 The tailless fox!'},{el:deerEl,label:'🦌 Only a deer!'},{el:cubEl,label:'🐾 Fox cub!'},{el:fishEl,label:'🐟 A fish!!'},{el:bbEl,label:'😄 Not him again!'},{el:badgersEl,label:'🦡 Badger brawl!'},{el:ottersEl,label:'📸 The otters got you first!'}];
+  const checks=[{el:heronEl,label:'🦅 Just the heron!'},{el:foxEl,label:'🦊 That fox!'},{el:fox2El,label:'🦊 The tailless fox!'},{el:deerEl,label:'🦌 Only a deer!'},{el:cubEl,label:'🐾 Fox cub!'},{el:fishEl,label:'🐟 A fish!!'},{el:bbEl,label:'😄 Not him again!'},{el:badgersEl,label:'🦡 Badger brawl!'},{el:ottersEl,label:'📸 The otters got you first!'},{el:tyreEl,label:'🛞 Just a tyre…'},{el:dogwalkerEl,label:'🐕 Watch out for the dog!'},{el:jogger2El,label:'🏃 Beep beep!'}];
   for(const{el,label}of checks){if(el.style.display!=='none'){const r=el.getBoundingClientRect();if(Math.abs(vfX-(r.left+r.width/2))<75&&Math.abs(vfY-(r.top+r.height/2))<75)return label;}}
   return['Just the river…','Beautiful foliage!','All green here!','Nothing there!','Missed it!'][Math.floor(Math.random()*5)];
 }
@@ -1647,7 +2294,7 @@ function captureThumb(){
   }
 
   // All visible animal canvases at their real screen positions
-  const animals = [heronEl, foxEl, fox2El, deerEl, cubEl, fishEl, badgersEl, ottersEl, kfEl, bbEl];
+  const animals = [heronEl, foxEl, fox2El, deerEl, cubEl, fishEl, badgersEl, ottersEl, kfEl, bbEl, tyreEl, dogwalkerEl, jogger2El];
   animals.forEach(el => {
     if (el.style.display === 'none') return;
     const r = el.getBoundingClientRect();
@@ -1709,8 +2356,8 @@ function gameLoop(){
   if(state.phase==='playing'){
     state.frame++;
     const f=state.frame;
-    if(state.kingfisherVisible){state.kfX+=state.kfDX;kfEl.style.left=state.kfX+'px';try{drawKingfisher(kfCtx,kfEl.width,kfEl.height,f);}catch(e){console.warn('kf draw err',e);}}
-    if(heronEl.style.display!=='none')drawHeron(heronCtx,heronEl.width,heronEl.height,f,state.heron.prop);
+    if(state.kingfisherVisible){state.kfX+=state.kfDX;state.kfY+=state.kfDY;kfEl.style.left=state.kfX+'px';kfEl.style.top=state.kfY+'px';try{drawKingfisher(kfCtx,kfEl.width,kfEl.height,f);}catch(e){console.warn('kf draw err',e);}}
+    if(heronEl.style.display!=='none')drawHeron(heronCtx,heronEl.width,heronEl.height,f,state.heron.prop,state.heron.fart);
     if(foxEl.style.display!=='none'){drawFox(foxCtx,foxEl.width,foxEl.height,f);state.fox.x+=state.fox.dx;foxEl.style.left=state.fox.x+'px';}
     if(fox2El.style.display!=='none'){drawFoxNoTail(fox2Ctx,fox2El.width,fox2El.height,f);state.fox2.x+=state.fox2.dx;fox2El.style.left=state.fox2.x+'px';}
     if(deerEl.style.display!=='none')drawDeer(deerCtx,deerEl.width,deerEl.height,f);
@@ -1719,6 +2366,9 @@ function gameLoop(){
     if(badgersEl.style.display!=='none') drawBadgers(badgersCtx,badgersEl.width,badgersEl.height,f);
     if(ottersEl.style.display!=='none')  drawOtters(ottersCtx,ottersEl.width,ottersEl.height,f);
     if(bbEl.style.display!=='none'){drawBingBong(bbCtx,bbEl.width,bbEl.height,f,state.bb.phrase);}
+    if(tyreEl.style.display!=='none'){drawTyre(tyreCtx,tyreEl.width,tyreEl.height,f);state.tyre.x+=state.tyre.dx;tyreEl.style.left=state.tyre.x+'px';}
+    if(dogwalkerEl.style.display!=='none') drawDogWalker(dogwalkerCtx,dogwalkerEl.width,dogwalkerEl.height,f);
+    if(jogger2El.style.display!=='none')   drawJogger2(jogger2Ctx,jogger2El.width,jogger2El.height,f);
     tickWeather();
   }
   requestAnimationFrame(gameLoop);
@@ -1860,6 +2510,26 @@ function sndOtters() {
   });
 }
 
+// ── HERON FART — wet, low, dignified
+function sndHeronFart() {
+  const ctx = getAudioCtx(); const t = ctx.currentTime;
+  // Low rumbling tone with pitch wobble
+  const osc = ctx.createOscillator(); const env = ctx.createGain();
+  osc.connect(env); env.connect(ctx.destination);
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(55, t);
+  osc.frequency.linearRampToValueAtTime(38, t + 0.18);
+  osc.frequency.linearRampToValueAtTime(62, t + 0.32);
+  osc.frequency.linearRampToValueAtTime(30, t + 0.55);
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(0.45, t + 0.04);
+  env.gain.setValueAtTime(0.45, t + 0.38);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + 0.62);
+  osc.start(t); osc.stop(t + 0.65);
+  // Wet noise burst
+  playNoise(0.55, 0.22, 180, ctx, t + 0.02);
+  playNoise(0.20, 0.12, 280, ctx, t + 0.35);
+}
 // ── BING BONG — silly ascending boing
 function sndBingBong() {
   const ctx = getAudioCtx(); const t = ctx.currentTime;
@@ -1919,32 +2589,22 @@ function sndRiverStop() {
 
 function startGame(){
   sndRiverStart();
-  state={phase:'playing',film:TOTAL_FILM,photos:0,frame:0,savedPhotos:[],
-    kingfisherVisible:false,kfX:0,kfY:0,kfDX:0,kfTimeout:null,kfHideTimeout:null,kfDirTimeout:null,
-    heron:{visible:false,prop:null},fox:{visible:false,x:0,dx:0},deer:{visible:false},cub:{visible:false,x:0,dx:0},
+  state={phase:'playing',film:TOTAL_FILM,photos:0,frame:0,savedPhotos:[],startTime:Date.now(),
+    kingfisherVisible:false,kfX:0,kfY:0,kfDX:0,kfDY:0,kfTimeout:null,kfHideTimeout:null,kfDirTimeout:null,
+    heron:{visible:false,prop:null,fart:false},fox:{visible:false,x:0,dx:0},deer:{visible:false},cub:{visible:false,x:0,dx:0},
     badgers:{visible:false},otters:{visible:false},
     fish:{visible:false,x:0,y:0,arc:0},fox2:{visible:false,x:0,dx:0},
+    tyre:{visible:false,x:0,dx:0},
+    dogwalker:{visible:false,scale:0.15,bottom:-400},
+    jogger2:{visible:false,scale:0.15,bottom:-400},
     bb:{visible:false,y:0}};
   ['start-screen','game-over-screen','win-screen'].forEach(id=>document.getElementById(id).style.display='none');
-  [heronEl,foxEl,deerEl,cubEl,kfEl,bbEl,badgersEl,ottersEl,fishEl,fox2El].forEach(e=>e.style.display='none');
+  [heronEl,foxEl,deerEl,cubEl,kfEl,bbEl,badgersEl,ottersEl,fishEl,fox2El,tyreEl,dogwalkerEl,jogger2El].forEach(e=>e.style.display='none');
   buildHUD(); scheduleKF(); startDistractors(); scheduleWeather();
   weather.state='none'; weather.alpha=0;
   showHint('Tap anywhere to snap!'); moveVF(SW/2,SH/2);
 }
 
-function triggerGameOver(){
-  state.phase='gameover'; clearTimeout(state.kfTimeout); clearTimeout(state.kfHideTimeout); clearInterval(state.kfDirTimeout); clearInterval(state.kfCallInterval);
-  sndRiverStop(); sndRainStop(); sndGameOver();
-  document.getElementById('gameover-msg').textContent=`You got ${state.photos} of 3 shots. The Dodder keeps its secret!`;
-  buildGallery('gallery',state.savedPhotos);
-  document.getElementById('game-over-screen').style.display='flex';
-}
-function triggerWin(){
-  state.phase='win'; clearTimeout(state.kfTimeout); clearTimeout(state.kfHideTimeout); clearInterval(state.kfDirTimeout); clearInterval(state.kfCallInterval);
-  sndRiverStop(); sndRainStop(); setTimeout(sndWin, 200);
-  buildGallery('win-gallery',state.savedPhotos);
-  document.getElementById('win-screen').style.display='flex';
-}
 function buildGallery(id,photos){
   const g=document.getElementById(id); g.innerHTML='';
   photos.forEach(c=>{const wrap=document.createElement('div');wrap.className='gallery-photo';wrap.style.setProperty('--r',((Math.random()-0.5)*10).toFixed(1));wrap.appendChild(c);g.appendChild(wrap);});
@@ -1954,9 +2614,170 @@ document.getElementById('start-btn').addEventListener('click',startGame);
 document.getElementById('retry-btn').addEventListener('click',startGame);
 document.getElementById('play-again-btn').addEventListener('click',startGame);
 
+// ── LEADERBOARD ───────────────────────────────────────────────────────────────
+const LB_KEY = 'dodder-kingfisher-lb-v1';
+const LB_WEEK_KEY = 'dodder-kingfisher-week-v1';
+
+function getThisMondayMidnight() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+  const daysToMonday = (day === 0) ? 6 : day - 1;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - daysToMonday);
+  monday.setHours(0, 0, 0, 0);
+  return monday.getTime();
+}
+
+function calcScore(photos, filmLeft, elapsedSecs) {
+  if (photos >= PHOTOS_TO_WIN) {
+    const timeBonus = Math.max(0, Math.round(500 - elapsedSecs * 5));
+    return 1000 + filmLeft * 200 + timeBonus;
+  }
+  return photos * 100;
+}
+
+async function loadScores() {
+  try {
+    const weekStart = getThisMondayMidnight();
+    const storedWeek = parseInt(localStorage.getItem(LB_WEEK_KEY) || '0', 10);
+    if (storedWeek < weekStart) {
+      localStorage.removeItem(LB_KEY);
+      localStorage.setItem(LB_WEEK_KEY, String(weekStart));
+      return [];
+    }
+    const raw = localStorage.getItem(LB_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+async function saveScore(initials, score, elapsedSecs) {
+  try {
+    const weekStart = getThisMondayMidnight();
+    localStorage.setItem(LB_WEEK_KEY, String(weekStart));
+    const scores = await loadScores();
+    scores.push({ initials: initials.toUpperCase(), score, date: new Date().toLocaleDateString('en-IE'), elapsed: Math.round(elapsedSecs) });
+    scores.sort((a, b) => b.score - a.score);
+    const top10 = scores.slice(0, 10);
+    localStorage.setItem(LB_KEY, JSON.stringify(top10));
+    return top10;
+  } catch(e) { return []; }
+}
+
+async function renderLeaderboard(targetEl) {
+  const scores = await loadScores();
+  const el = targetEl || document.getElementById('lb-content');
+  if (!el) return;
+  if (!scores.length) {
+    el.innerHTML = '<p class="lb-empty">No scores yet — be the first!</p>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  const rows = scores.map((s, i) =>
+    `<tr><td>${medals[i] || (i+1)+'.'}</td><td>${s.initials}</td><td>${s.score} pts</td><td style="color:#6a9a6a;font-size:11px;padding-left:4px">${s.elapsed != null ? (s.elapsed >= 60 ? Math.floor(s.elapsed/60)+'m '+Math.floor(s.elapsed%60)+'s' : s.elapsed+'s') : s.date}</td></tr>`
+  ).join('');
+  const monday = new Date(getThisMondayMidnight());
+  const weekStr = monday.toLocaleDateString('en-IE', { day:'numeric', month:'short' });
+  el.innerHTML = `<h3 style="font-family:'Fredoka One',cursive;color:#FFD700;font-size:clamp(15px,4vw,18px);margin:0 0 4px;">🏆 Top Scores</h3><p style="color:#6a9a6a;font-size:11px;margin:0 0 8px;">Week of ${weekStr}</p><table class="lb-table">${rows}</table>`;
+}
+
+function setupInitialsInput(prefix, inlineLbId, onSubmit) {
+  const i1 = document.getElementById(prefix+'-i1');
+  const i2 = document.getElementById(prefix+'-i2');
+  const i3 = document.getElementById(prefix+'-i3');
+  const btn = document.getElementById(prefix+'-submit-btn');
+  const section = document.getElementById(prefix+'-initials-section');
+  const lbEl = document.getElementById(inlineLbId);
+
+  // Clear inputs and reset
+  [i1,i2,i3].forEach(el => { el.value = ''; });
+  section.style.display = 'block';
+  section.style.opacity = '1';
+  if (lbEl) lbEl.style.display = 'none';
+  btn.textContent = 'Submit Score';
+  btn.disabled = false;
+
+  // Auto-advance between boxes
+  function wire(el, prev, next) {
+    el.addEventListener('input', () => {
+      el.value = el.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(-1);
+      if (el.value && next) next.focus();
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !el.value && prev) { prev.focus(); }
+    });
+  }
+  wire(i1, null, i2);
+  wire(i2, i1, i3);
+  wire(i3, i2, null);
+
+  btn.onclick = async () => {
+    const initials = (i1.value + i2.value + i3.value).trim();
+    if (initials.length < 1) { i1.focus(); return; }
+    const padded = initials.padEnd(3, '_');
+    btn.textContent = 'Saved! 🎉';
+    btn.disabled = true;
+    await onSubmit(padded);
+    // Swap: hide initials, show inline leaderboard
+    setTimeout(() => {
+      section.style.display = 'none';
+      if (lbEl) {
+        lbEl.style.display = 'block';
+        renderLeaderboard(lbEl);
+      }
+    }, 600);
+  };
+
+  setTimeout(() => i1.focus(), 300);
+}
+
+function scoreLabel(score, elapsedSecs) {
+  const mins = Math.floor(elapsedSecs / 60);
+  const secs = Math.floor(elapsedSecs % 60);
+  const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+  if (score >= 1000) return `You scored ${score} pts in ${timeStr}!`;
+  return `You scored ${score} pts in ${timeStr}.`;
+}
+
+function triggerGameOver(){
+  state.phase='gameover';
+  clearTimeout(state.kfTimeout); clearTimeout(state.kfHideTimeout);
+  clearInterval(state.kfDirTimeout); clearInterval(state.kfCallInterval);
+  sndRiverStop(); sndRainStop(); sndGameOver();
+  const elapsed = (Date.now() - state.startTime) / 1000;
+  const score = calcScore(state.photos, state.film, elapsed);
+  document.getElementById('gameover-msg').textContent =
+    `You got ${state.photos} of 3 shots. The Dodder keeps its secret! ${scoreLabel(score, elapsed)}`;
+  buildGallery('gallery', state.savedPhotos);
+  document.getElementById('game-over-screen').style.display='flex';
+  setupInitialsInput('go', 'go-lb', async (initials) => {
+    await saveScore(initials, score, elapsed);
+    renderLeaderboard(document.getElementById('lb-content'));
+  });
+}
+
+function triggerWin(){
+  state.phase='win';
+  clearTimeout(state.kfTimeout); clearTimeout(state.kfHideTimeout);
+  clearInterval(state.kfDirTimeout); clearInterval(state.kfCallInterval);
+  sndRiverStop(); sndRainStop(); setTimeout(sndWin, 200);
+  const elapsed = (Date.now() - state.startTime) / 1000;
+  const score = calcScore(state.photos, state.film, elapsed);
+  buildGallery('win-gallery', state.savedPhotos);
+  document.getElementById('win-screen').style.display='flex';
+  setupInitialsInput('win', 'win-lb', async (initials) => {
+    await saveScore(initials, score, elapsed);
+    renderLeaderboard(document.getElementById('lb-content'));
+  });
+}
+
+// Load leaderboard on start
+renderLeaderboard();
+
 window.addEventListener('resize',resizeScene);
 resizeScene();
 requestAnimationFrame(gameLoop);
+
+
 </script>
 </body>
 </html>
